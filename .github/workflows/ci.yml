@@ -56,9 +56,7 @@ jobs:
         run: bundle install --retry 2 --path vendor/bundle
       - name: Setup examples
         run: ./scripts/pod_setup.sh
-      - name: Cocoapods Lint
-        # We need to pass IGListDiffKit.podspec here so that Cocoapods uses the local version,
-        # rather than searching the specs repository for the IGListDiffKit spec.
+      - name: Build example project
         run: |-
           set -o pipefail
           xcodebuild -version -sdk
@@ -67,3 +65,4 @@ jobs:
           WORKSPACE: Examples/Examples-iOS/IGListKitExamples.xcworkspace
           SDK: iphonesimulator12.2
           SCHEME: IGListKit
+          DESTINATION: ${{ matrix.destination }}
