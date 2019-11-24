@@ -28,10 +28,10 @@ jobs:
     strategy:
       matrix:
         destination:
-          - OS=9.3,name=iPad Air 2
-          - OS=10.3.1,name=iPhone 7
-          - OS=11.3,name=iPhone X
-          - OS=12.2,name=iPhone Xʀ
+          # - OS=9.3,name=iPad Air 2
+          # - OS=10.3.1,name=iPhone 7
+          - OS=13.2,name=iPhone 11 Pro
+          # - OS=12.2,name=iPhone Xʀ
     steps:
       - uses: actions/checkout@v1
       - name: Cache bundler
