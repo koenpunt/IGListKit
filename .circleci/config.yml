@@ -1,0 +1,236 @@
+version: 2.1
+
+commands:
+  prepare:
+    steps:
+      - run: bundle install
+      - run: bundle exec pod install
+  build_example_project:
+    parameters:
+      destination:
+        type: string
+      sdk:
+        type: string
+      scheme:
+        type: string
+      workspace:
+        type: string
+    steps:
+      - run:
+          name: Build Example Project
+          command: |
+            set -o pipefail
+            xcodebuild -version -sdk
+            xcodebuild build -workspace "<< parameters.workspace >>" -scheme "<< parameters.scheme >>" -sdk "<< parameters.sdk >>" -destination "<< parameters.destination >>" ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO | bundle exec xcpretty -c;
+  run_unit_tests:
+    parameters:
+      destination:
+        type: string
+      sdk:
+        type: string
+      scheme:
+        type: string
+      workspace:
+        type: string
+    steps:
+      - run:
+          name: Run Unit Tests
+          command: |
+            set -o pipefail
+            xcodebuild build build-for-testing -workspace "<< parameters.workspace >>" -scheme "<< parameters.scheme >>" -sdk "<< parameters.sdk >>" -destination "<< parameters.destination >>" -configuration Debug ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES ONLY_ACTIVE_ARCH=YES | bundle exec xcpretty -c;
+            xcodebuild analyze test-without-building -workspace "<< parameters.workspace >>" -scheme "<< parameters.scheme >>" -sdk "<< parameters.sdk >>" -destination "<< parameters.destination >>" -configuration Debug ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES ONLY_ACTIVE_ARCH=YES | bundle exec xcpretty -c;
+  run_ui_tests:
+    parameters:
+      destination:
+        type: string
+      sdk:
+        type: string
+      scheme:
+        type: string
+      workspace:
+        type: string
+    steps:
+      - run:
+          name: Run UI Tests
+          command: |
+            set -o pipefail
+            xcodebuild build test -workspace "<< parameters.workspace >>" -scheme "<< parameters.scheme >>" -sdk "<< parameters.sdk >>" -destination "<< parameters.destination >>" -configuration Debug ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO | bundle exec xcpretty -c;
+
+jobs:
+  Build Example iOS 9:
+    macos:
+      xcode: "10.2"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - prepare
+      - build_example_project:
+          workspace: Examples/Examples-iOS/IGListKitExamples.xcworkspace
+          scheme: IGListKitExamples
+          sdk: iphonesimulator12.2
+          destination: OS=9.3,name=iPad Air 2
+
+  Build Example iOS 10:
+    macos:
+      xcode: "10.2"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - prepare
+      - build_example_project:
+          workspace: Examples/Examples-iOS/IGListKitExamples.xcworkspace
+          scheme: IGListKitExamples
+          sdk: iphonesimulator12.2
+          destination: OS=10.3.1,name=iPhone 7
+
+  Build Example iOS 11:
+    macos:
+      xcode: "10.2"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - prepare
+      - build_example_project:
+          workspace: Examples/Examples-iOS/IGListKitExamples.xcworkspace
+          scheme: IGListKitExamples
+          sdk: iphonesimulator12.2
+          destination: OS=11.3,name=iPhone X
+
+  Build Example iOS 12:
+    macos:
+      xcode: "10.2"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - prepare
+      - build_example_project:
+          workspace: Examples/Examples-iOS/IGListKitExamples.xcworkspace
+          scheme: IGListKitExamples
+          sdk: iphonesimulator12.2
+          destination: OS=12.2,name=iPhone Xʀ
+
+  Build Example macOS:
+    macos:
+      xcode: "10.2"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - prepare
+      - build_example_project:
+          workspace: Examples/Examples-macOS/IGListKitExamples.xcworkspace
+          scheme: IGListKitExamples
+          sdk: macosx10.14
+          destination: arch=x86_64
+
+  Build Example tvOS 10:
+    macos:
+      xcode: "10.2"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - prepare
+      - build_example_project:
+          workspace: Examples/Examples-tvOS/IGListKitExamples.xcworkspace
+          scheme: IGListKitExamples
+          sdk: appletvsimulator12.2
+          destination: OS=10.2,name=Apple TV 1080p
+
+  Build Example tvOS 11:
+    macos:
+      xcode: "10.2"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - prepare
+      - build_example_project:
+          workspace: Examples/Examples-tvOS/IGListKitExamples.xcworkspace
+          scheme: IGListKitExamples
+          sdk: appletvsimulator12.2
+          destination: OS=11.3,name=Apple TV 4K
+
+  Build Example tvOS 12:
+    macos:
+      xcode: "10.2"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - prepare
+      - build_example_project:
+          workspace: Examples/Examples-tvOS/IGListKitExamples.xcworkspace
+          scheme: IGListKitExamples
+          sdk: appletvsimulator12.2
+          destination: OS=12.2,name=Apple TV 4K
+
+  Unit Tests iOS 12:
+    macos:
+      xcode: "10.2"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - prepare
+      - run_unit_tests:
+          workspace: IGListKit.xcworkspace
+          scheme: IGListKit
+          sdk: iphonesimulator12.2
+          destination: OS=12.2,name=iPhone Xʀ
+      - run: bundle exec slather
+
+  Unit Tests tvOS 12:
+    macos:
+      xcode: "10.2"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - prepare
+      - run_unit_tests:
+          workspace: IGListKit.xcworkspace
+          scheme: IGListKit
+          sdk: appletvsimulator12.2
+          destination: OS=12.2,name=Apple TV 4K
+      - run: bundle exec slather
+
+  UI Tests:
+    macos:
+      xcode: "10.2"
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - prepare
+      - run_ui_tests:
+          workspace: Examples/Examples-iOS/IGListKitExamples.xcworkspace
+          scheme: IGListKitExamples
+          sdk: iphonesimulator12.2
+          destination: OS=12.2,name=iPhone Xʀ
+      - run: bundle exec slather
+
+workflows:
+  version: 2
+  Build Example iOS 9:
+    jobs:
+      - Build Example iOS 9
+  Build Example iOS 10:
+    jobs:
+      - Build Example iOS 10
+  Build Example iOS 11:
+    jobs:
+      - Build Example iOS 11
+  Build Example iOS 12:
+    jobs:
+      - Build Example iOS 12
+  Build Example macOS:
+    jobs:
+      - Build Example macOS
+  Build Example tvOS 10:
+    jobs:
+      - Build Example tvOS 10
+  Build Example tvOS 11:
+    jobs:
+      - Build Example tvOS 11
+  Build Example tvOS 12:
+    jobs:
+      - Build Example tvOS 12
+  Tests:
+    jobs:
+      - Unit Tests iOS 12
+      - Unit Tests tvOS 12
+      - UI Tests
