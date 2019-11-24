@@ -48,6 +48,8 @@ jobs:
       #     key: ${{ runner.os }}-cocoapods-${{ hashFiles('**/Podfile.lock') }}
       #     restore-keys: |
       #       ${{ runner.os }}-cocoapods-
+      - name: List Simulators
+        run: xcversion simulators
       - name: Install rubygems
         run: gem install bundler
       - name: Install swiftlint
