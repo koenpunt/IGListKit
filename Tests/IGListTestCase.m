@@ -15,7 +15,7 @@
     IGAssert(self.dataSource != nil, @"Data source must be set in -setUp before testing %@", NSStringFromClass(self.class));
 
     if (CGRectEqualToRect(self.frame, CGRectZero)) {
-        self.frame = CGRectMake(0, 0, 100, 100);
+        self.frame = CGRectMake(0, 0, 100, 105);
     }
 
     self.window = [[UIWindow alloc] initWithFrame:self.frame];
